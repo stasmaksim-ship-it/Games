@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile Racing</title>
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+body {
+    background: #08090d;
+    color: white;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+/* Верхняя панель */
+.header {
+    height: 60px;
+    background: #11131a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+}
+.logo {
+    color: #ff3030;
+    font-size: 20px;
+    font-weight: bold;
+}
+/* Игра */
+.game {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 60px);
+    background: #202020;
+    overflow: hidden;
+}
+/* Дорога */
+.road {
+    position: absolute;
+    width: 70%;
+    height: 100%;
+    left: 15%;
+    background: #333;
+    border-left: 5px solid white;
+    border-right: 5px solid white;
+}
+/* Разметка */
+.line {
+    position: absolute;
+    width: 7px;
+    height: 90px;
+    background: white;
+    left: 50%;
+    animation: moveRoad 0.6s linear infinite;
+}
+.line1 {
+    top: -100px;
+}
+.line2 {
+    top: 150px;
+}
+.line3 {
+    top: 400px;
+}
+@keyframes moveRoad {
+    from {
+        transform: translateY(-150px);
+    }
+    to {
+        transform: translateY(650px);
+    }
+}
+/* Машина игрока */
+.player {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 55px;
+    transition: left 0.12s;
+}
+/* Вражеская машина */
+.enemy {
+    position: absolute;
+    top: 50px;
+    left: 35%;
+    font-size: 50px;
+    animation: enemyMove 2s linear infinite;
+}
+@keyframes enemyMove {
+    from {
+        top: -70px;
+    }
+    to {
+        top: 100%;
+    }
+}
+/* Скорость */
+.speed {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(0,0,0,.6);
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-size: 18px;
+}
+/* Управление */
+.controls {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 25px;
+}
+.control {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    background: rgba(0,0,0,.6);
+    color: white;
+    font-size: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+}
+.control:active {
+    background: #ff3030;
+    transform: scale(.92);
+}
+/* Старт */
+.start-screen {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.85);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+.start-screen h1 {
+    font-size: 40px;
+    color: #ff3030;
+    margin-bottom: 15px;
+}
+.start-screen p {
+    color: #aaa;
+    margin-bottom: 30px;
+}
+.start-button {
+    background: #ff3030;
+    border: none;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 15px 35px;
+    border-radius: 10px;
+}
+/* Телефон */
+@media (max-width: 600px) {
+    .road {
+        width: 75%;
+        left: 12.5%;
+    }
+}
+</style>
+</head>
+<body>
+<div class="header">
+    <div class="logo">🏁 RACING</div>
+    <div>🏆 0</div>
+</div>
+<div class="game">
+    <div class="speed">
+        Скорость: <span id="speed">0</span> км/ч
+    </div>
+    <div class="road">
+        <div class="line line1"></div>
+        <div class="line line2"></div>
+        <div class="line line3"></div>
+        <div class="enemy" id="enemy">
+            🚗
+        </div>
+        <div class="player" id="player">
+            🏎️
+        </div>
+    </div>
+    <!-- Управление -->
+    <div class="controls">
+        <div class="control" id="left">
+            ←
+        </div>
+        <div class="control" id="right">
+            →
+        </div>
+    </div>
+    <!-- Старт -->
+    <div class="start-screen" id="startScreen">
+        <h1>RACING</h1>
+        <p>Объезжай машины и набирай скорость!</p>
+        <button class="start-button" onclick="startGame()">
+            НАЧАТЬ
+        </button>
+    </div>
+</div>
+<script>
+const player = document.getElementById("player");
+const speedText = document.getElementById("speed");
+let playerPosition = 50;
+let speed = 0;
+let gameStarted = false;
+/* Старт */
+function startGame() {
+    document.getElementById("startScreen").style.display = "none";
+    gameStarted = true;
+    setInterval(() => {
+        if (speed < 300) {
+            speed += 5;
+        }
+        speedText.innerText = speed;
+    }, 200);
+}
+/* Движение влево */
+function moveLeft() {
+    if (!gameStarted) return;
+    if (playerPosition > 25) {
+        playerPosition -= 10;
+        player.style.left = playerPosition + "%";
+    }
+}
+/* Движение вправо */
+function moveRight() {
+    if (!gameStarted) return;
+    if (playerPosition < 75) {
+        playerPosition += 10;
+        player.style.left = playerPosition + "%";
+    }
+}
+/* Кнопки */
+document.getElementById("left").addEventListener("touchstart", function(e) {
+    e.preventDefault();
+    moveLeft();
+});
+document.getElementById("right").addEventListener("touchstart", function(e) {
+    e.preventDefault();
+    moveRight();
+});
+/* Также работает с клавиатурой */
+document.addEventListener("keydown", function(e) {
+    if (e.key === "ArrowLeft") {
+        moveLeft();
+    }
+    if (e.key === "ArrowRight") {
+        moveRight();
+    }
+});
+</script>
+</body>
+</html>
